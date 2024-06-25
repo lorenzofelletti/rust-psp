@@ -6,26 +6,26 @@ bitflags::bitflags! {
     pub struct PowerInfo: u32 {
         /// Indicates the power switch is pushed, putting the unit into suspend
         /// mode.
-        const POWER_SWITCH = 0x80000000;
+        const POWER_SWITCH = 0x8000_0000;
         /// Indicates the hold switch is on.
-        const HOLD_SWITCH = 0x40000000;
+        const HOLD_SWITCH = 0x4000_0000;
         /// Indicates the screen is off.
-        const STANDBY = 0x00080000;
+        const STANDBY = 0x0008_0000;
         /// Indicates the resume process is complete. Only seems to be triggered
         /// when another event happens.
-        const RESUME_COMPLETE = 0x00040000;
+        const RESUME_COMPLETE = 0x0004_0000;
         /// Indicates the unit is resuming from suspend mode.
-        const RESUMING = 0x00020000;
+        const RESUMING = 0x0002_0000;
         /// Indicates the unit is suspending, seems to occur due to inactivity.
-        const SUSPENDING = 0x00010000;
+        const SUSPENDING = 0x0001_0000;
         /// Indicates the unit is plugged into an AC outlet.
-        const AC_POWER = 0x00001000;
+        const AC_POWER = 0x0000_1000;
         /// Indicates the battery charge level is low.
-        const BATTERY_LOW = 0x00000100;
+        const BATTERY_LOW = 0x0000_0100;
         /// Indicates there is a battery present in the unit.
-        const BATTERY_EXIST = 0x00000080;
+        const BATTERY_EXIST = 0x0000_0080;
         /// Indicates that the system is running on battery power.
-        const BATTERY_POWER = 0x0000007;
+        const BATTERY_POWER = 0x0000_0007;
     }
 }
 

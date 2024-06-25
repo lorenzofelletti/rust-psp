@@ -25,6 +25,7 @@ enum TestRunnerMode {
 }
 
 impl<'a> TestRunner<'a> {
+    #[must_use]
     pub fn new_fifo_runner() -> Self {
         let fd = get_test_output_pipe();
         Self {
@@ -34,6 +35,7 @@ impl<'a> TestRunner<'a> {
         }
     }
 
+    #[must_use]
     pub fn new_file_runner() -> Self {
         let fd = get_test_output_file();
         Self {
@@ -43,6 +45,7 @@ impl<'a> TestRunner<'a> {
         }
     }
 
+    #[must_use]
     pub fn new_dprintln_runner() -> Self {
         Self {
             mode: TestRunnerMode::Dprintln,

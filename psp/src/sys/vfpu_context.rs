@@ -28,7 +28,8 @@ pub struct Context {
 }
 
 impl Context {
-    /// Threads which call this must have ThreadAttributes::VFPU set
+    /// Threads which call this must have `ThreadAttributes::VFPU` set
+    #[must_use]
     pub fn new() -> Self {
         let zero_vector = ScePspFVector4 {
             x: 0.0,

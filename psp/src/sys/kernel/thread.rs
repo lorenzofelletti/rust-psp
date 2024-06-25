@@ -62,26 +62,26 @@ bitflags::bitflags! {
     #[repr(transparent)]
     pub struct ThreadAttributes: u32 {
         /// Enable VFPU access for the thread.
-        const VFPU = 0x00004000;
+        const VFPU = 0x0000_4000;
 
         /// Start the thread in user mode (done automatically if the thread
         /// creating it is in user mode).
-        const USER = 0x80000000;
+        const USER = 0x8000_0000;
 
         /// Thread is part of the USB/WLAN API.
-        const USBWLAN = 0xa0000000;
+        const USBWLAN = 0xA000_0000;
 
         /// Thread is part of the VSH API.
-        const VSH = 0xc0000000;
+        const VSH = 0xC000_0000;
 
         /// Allow using scratchpad memory for a thread, NOT USABLE ON V1.0
-        const SCRATCH_SRAM = 0x00008000;
+        const SCRATCH_SRAM = 0x0000_8000;
 
         /// Disables filling the stack with `0xFF` on creation.
-        const NO_FILLSTACK = 0x00100000;
+        const NO_FILLSTACK = 0x0010_0000;
 
         /// Clear the stack when the thread is deleted.
-        const CLEAR_STACK = 0x00200000;
+        const CLEAR_STACK = 0x0020_0000;
     }
 }
 

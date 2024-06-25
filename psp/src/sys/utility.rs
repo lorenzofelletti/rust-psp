@@ -647,29 +647,29 @@ bitflags::bitflags! {
     #[derive(Debug, Copy, Clone)]
     pub struct UtilityHtmlViewerOption: u32 {
         /// Open SCE net start page
-    const OPEN_SCE_START_PAGE  = 0x000001;
+    const OPEN_SCE_START_PAGE  = 0x0000_0001;
     /// Disable startup limitations
-    const DISABLE_STARTUP_LIMITS = 0x000002;
+    const DISABLE_STARTUP_LIMITS = 0x0000_0002;
     /// Disable exit confirmation dialog
-    const DISABLE_EXIT_DIALOG = 0x000004;
+    const DISABLE_EXIT_DIALOG = 0x0000_0004;
     /// Disable cursor
-    const DISABLE_CURSOR = 0x000008;
+    const DISABLE_CURSOR = 0x0000_0008;
     /// Disable download completion confirmation dialog
-    const DISABLE_DOWNLOAD_COMPLETE_DIALOG = 0x000010;
+    const DISABLE_DOWNLOAD_COMPLETE_DIALOG = 0x0000_0010;
     /// Disable download confirmation dialog
-    const DISABLE_DOWNLOAD_START_DIALOG = 0x000020;
+    const DISABLE_DOWNLOAD_START_DIALOG = 0x0000_0020;
     /// Disable save destination confirmation dialog
-    const DISABLE_DOWNLOAD_DESTINATION_DIALOG = 0x000040;
+    const DISABLE_DOWNLOAD_DESTINATION_DIALOG = 0x0000_0040;
     /// Disable modification of the download destination
-    const LOCK_DOWNLOAD_DESTINATION_DIALOG= 0x000080;
+    const LOCK_DOWNLOAD_DESTINATION_DIALOG= 0x0000_0080;
     /// Disable tab display
-    const DISABLE_TAB_DISPLAY = 0x000100;
+    const DISABLE_TAB_DISPLAY = 0x00_000100;
     /// Hold analog controller when HOLD button is down
-    const ENABLE_ANALOG_HOLD = 0x000200;
+    const ENABLE_ANALOG_HOLD = 0x0000_0200;
     /// Enable Flash Player
-    const ENABLE_FLASH = 0x000400;
+    const ENABLE_FLASH = 0x0000_00400;
     /// Disable L/R triggers for back/forward
-    const DISABLE_LRTRIGGER = 0x000800;
+    const DISABLE_LRTRIGGER = 0x000_0800;
     }
 }
 

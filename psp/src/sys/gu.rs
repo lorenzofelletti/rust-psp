@@ -9,7 +9,7 @@ use core::{ffi::c_void, mem, ptr::addr_of_mut, ptr::null_mut};
 use num_enum::TryFromPrimitive;
 
 #[allow(clippy::approx_constant)]
-pub const GU_PI: f32 = 3.141593;
+pub const GU_PI: f32 = 3.141_593;
 
 /// Primitive types
 #[repr(u32)]
@@ -862,7 +862,7 @@ const LIGHT_COMMANDS: [GuLightSettings; 4] = [
 
 #[inline]
 unsafe fn send_command_i(cmd: GeCommand, argument: i32) {
-    (*(*LIST).current) = ((cmd as u32) << 24) | (argument as u32 & 0xffffff);
+    (*(*LIST).current) = ((cmd as u32) << 24) | (argument as u32 & 0x00FF_FFFF);
     (*LIST).current = (*LIST).current.add(1);
 }
 
@@ -984,10 +984,10 @@ pub unsafe extern "C" fn sceGuDepthBuffer(zbp: *mut c_void, zbw: i32) {
         DRAW_BUFFER.depth_width = zbw;
     }
 
-    send_command_i(GeCommand::ZBufPtr, zbp as i32 & 0xffffff);
+    send_command_i(GeCommand::ZBufPtr, zbp as i32 & 0x00FF_FFFF);
     send_command_i(
         GeCommand::ZBufWidth,
-        (((zbp as u32 & 0xff000000) >> 8) | zbw as u32) as i32,
+        (((zbp as u32 & 0xFF00_0000) >> 8) | zbw as u32) as i32,
     );
 }
 
@@ -1061,19 +1061,19 @@ pub unsafe extern "C" fn sceGuDrawBuffer(psm: DisplayPixelFormat, fbp: *mut c_vo
     send_command_i(GeCommand::FramebufPixFormat, psm as i32);
     send_command_i(
         GeCommand::FrameBufPtr,
-        DRAW_BUFFER.frame_buffer as i32 & 0xffffff,
+        DRAW_BUFFER.frame_buffer as i32 & 0x00FF_FFFF,
     );
     send_command_i(
         GeCommand::FrameBufWidth,
-        ((DRAW_BUFFER.frame_buffer as u32 & 0xff000000) >> 8) as i32 | DRAW_BUFFER.frame_width,
+        ((DRAW_BUFFER.frame_buffer as u32 & 0xFF00_0000) >> 8) as i32 | DRAW_BUFFER.frame_width,
     );
     send_command_i(
         GeCommand::ZBufPtr,
-        DRAW_BUFFER.depth_buffer as i32 & 0xffffff,
+        DRAW_BUFFER.depth_buffer as i32 & 0x00FF_FFFF,
     );
     send_command_i(
         GeCommand::ZBufWidth,
-        ((DRAW_BUFFER.depth_buffer as u32 & 0xff000000) >> 8) as i32 | DRAW_BUFFER.depth_width,
+        ((DRAW_BUFFER.depth_buffer as u32 & 0xFF00_0000) >> 8) as i32 | DRAW_BUFFER.depth_width,
     );
 }
 
@@ -1088,10 +1088,10 @@ pub unsafe extern "C" fn sceGuDrawBuffer(psm: DisplayPixelFormat, fbp: *mut c_vo
 #[no_mangle]
 pub unsafe extern "C" fn sceGuDrawBufferList(psm: DisplayPixelFormat, fbp: *mut c_void, fbw: i32) {
     send_command_i(GeCommand::FramebufPixFormat, psm as i32);
-    send_command_i(GeCommand::FrameBufPtr, fbp as i32 & 0xffffff);
+    send_command_i(GeCommand::FrameBufPtr, fbp as i32 & 0x00FF_FFFF);
     send_command_i(
         GeCommand::FrameBufWidth,
-        ((fbp as u32 & 0xff000000) >> 8) as i32 | fbw,
+        ((fbp as u32 & 0xFF00_0000) >> 8) as i32 | fbw,
     );
 }
 
@@ -1201,7 +1201,7 @@ pub unsafe extern "C" fn sceGuFog(near: f32, far: f32, color: u32) {
         distance = 1.0 / distance;
     }
 
-    send_command_i(GeCommand::FogColor, (color & 0xffffff) as i32);
+    send_command_i(GeCommand::FogColor, (color & 0x00FF_FFFF) as i32);
     send_command_f(GeCommand::Fog1, far);
     send_command_f(GeCommand::Fog2, distance);
 }
@@ -1464,7 +1464,7 @@ pub unsafe extern "C" fn sceGuInit() {
     GE_EDRAM_ADDRESS = sys::sceGeEdramGetAddr().cast::<c_void>();
 
     GE_LIST_EXECUTED[0] = sys::sceGeListEnQueue(
-        (&INIT_LIST as *const _ as u32 & 0x1fffffff) as *const _,
+        (&INIT_LIST as *const _ as u32 & 0x1FFF_FFFF) as *const _,
         core::ptr::null_mut(),
         SETTINGS.ge_callback_id,
         core::ptr::null_mut(),
@@ -1621,7 +1621,7 @@ pub unsafe extern "C" fn sceGuGetMemory(mut size: i32) -> *mut c_void {
     let orig_ptr = (*LIST).current;
     let new_ptr = (orig_ptr as usize + size as usize + 8) as *mut u32;
 
-    let lo = (8 << 24) | (new_ptr as i32 & 0xffffff);
+    let lo = (8 << 24) | (new_ptr as i32 & 0x00FF_FFFF);
     let hi = ((16 << 24) | ((new_ptr as u32 >> 8) & 0xf0000)) as i32;
 
     *orig_ptr = hi as u32;
@@ -1714,7 +1714,7 @@ pub unsafe extern "C" fn sceGuStart(context_type: GuContextType, list: *mut c_vo
         if DRAW_BUFFER.frame_width != 0 {
             send_command_i(
                 GeCommand::FrameBufPtr,
-                DRAW_BUFFER.frame_buffer as i32 & 0xffffff,
+                DRAW_BUFFER.frame_buffer as i32 & 0x00FF_FFFF,
             );
             send_command_i(
                 GeCommand::FrameBufWidth,
@@ -1750,7 +1750,7 @@ pub unsafe extern "C" fn sceGuFinish() -> i32 {
 
         GuContextType::Call => {
             if CALL_MODE == 1 {
-                send_command_i(GeCommand::Signal, 0x120000);
+                send_command_i(GeCommand::Signal, 0x0012_0000);
                 send_command_i(GeCommand::End, 0);
                 send_command_i_stall(GeCommand::Nop, 0);
             } else {
@@ -1786,13 +1786,13 @@ pub unsafe extern "C" fn sceGuFinish() -> i32 {
 pub unsafe extern "C" fn sceGuFinishId(id: u32) -> i32 {
     match CURR_CONTEXT {
         GuContextType::Direct | GuContextType::Send => {
-            send_command_i(GeCommand::Finish, (id & 0xffff) as i32);
+            send_command_i(GeCommand::Finish, (id & 0x0000_FFFF) as i32);
             send_command_i_stall(GeCommand::End, 0);
         }
 
         GuContextType::Call => {
             if CALL_MODE == 1 {
-                send_command_i(GeCommand::Signal, 0x120000);
+                send_command_i(GeCommand::Signal, 0x0012_0000);
                 send_command_i(GeCommand::End, 0);
                 send_command_i_stall(GeCommand::Nop, 0);
             } else {
@@ -1820,12 +1820,12 @@ pub unsafe extern "C" fn sceGuCallList(list: *const c_void) {
     let list_addr = list as u32;
 
     if CALL_MODE == 1 {
-        send_command_i(GeCommand::Signal, (list_addr >> 16) as i32 | 0x110000);
-        send_command_i(GeCommand::End, list_addr as i32 & 0xffff);
+        send_command_i(GeCommand::Signal, (list_addr >> 16) as i32 | 0x0011_0000);
+        send_command_i(GeCommand::End, list_addr as i32 & 0x0000_FFFF);
         send_command_i_stall(GeCommand::Nop, 0);
     } else {
-        send_command_i(GeCommand::Base, (list_addr >> 8) as i32 & 0xf0000);
-        send_command_i_stall(GeCommand::Call, list_addr as i32 & 0xffffff);
+        send_command_i(GeCommand::Base, (list_addr >> 8) as i32 & 0x000F_0000);
+        send_command_i_stall(GeCommand::Call, list_addr as i32 & 0x00FF_FFFF);
     }
 }
 
@@ -1978,12 +1978,12 @@ pub unsafe extern "C" fn sceGuDrawArray(
 
     if !indices.is_null() {
         send_command_i(GeCommand::Base, (indices as u32 >> 8) as i32 & 0xf0000);
-        send_command_i(GeCommand::Iaddr, indices as i32 & 0xffffff);
+        send_command_i(GeCommand::Iaddr, indices as i32 & 0x00FF_FFFF);
     }
 
     if !vertices.is_null() {
         send_command_i(GeCommand::Base, (vertices as u32 >> 8) as i32 & 0xf0000);
-        send_command_i(GeCommand::Vaddr, vertices as i32 & 0xffffff);
+        send_command_i(GeCommand::Vaddr, vertices as i32 & 0x00FF_FFFF);
     }
 
     send_command_i_stall(GeCommand::Prim, ((prim as i32) << 16) | count);
@@ -2015,12 +2015,12 @@ pub unsafe extern "C" fn sceGuBeginObject(
 
     if !indices.is_null() {
         send_command_i(GeCommand::Base, (indices as u32 >> 8) as i32 & 0xf0000);
-        send_command_i(GeCommand::Iaddr, indices as i32 & 0xffffff);
+        send_command_i(GeCommand::Iaddr, indices as i32 & 0x00FF_FFFF);
     }
 
     if !vertices.is_null() {
         send_command_i(GeCommand::Base, (vertices as u32 >> 8) as i32 & 0xf0000);
-        send_command_i(GeCommand::Vaddr, vertices as i32 & 0xffffff);
+        send_command_i(GeCommand::Vaddr, vertices as i32 & 0x00FF_FFFF);
     }
 
     send_command_i(GeCommand::BoundingBox, count);
@@ -2044,7 +2044,7 @@ pub unsafe extern "C" fn sceGuEndObject() {
     (*LIST).current = *OBJECT_STACK.offset(OBJECT_STACK_DEPTH as isize - 1);
 
     send_command_i(GeCommand::Base, (current as u32 >> 8) as i32 & 0xf0000);
-    send_command_i(GeCommand::BJump, current as i32 & 0xffffff);
+    send_command_i(GeCommand::BJump, current as i32 & 0x00FF_FFFF);
     (*LIST).current = current;
     OBJECT_STACK_DEPTH -= 1;
 }
@@ -2286,15 +2286,15 @@ pub unsafe extern "C" fn sceGuLightColor(light: i32, component: LightComponent, 
     // TODO: Or maybe only certain combinations are valid?
 
     if component.intersects(LightComponent::AMBIENT) {
-        send_command_i(settings.ambient, (color & 0xffffff) as i32);
+        send_command_i(settings.ambient, (color & 0x00FF_FFFF) as i32);
     }
 
     if component.intersects(LightComponent::DIFFUSE) {
-        send_command_i(settings.diffuse, (color & 0xffffff) as i32);
+        send_command_i(settings.diffuse, (color & 0x00FF_FFFF) as i32);
     }
 
     if component.intersects(LightComponent::SPECULAR) {
-        send_command_i(settings.specular, (color & 0xffffff) as i32);
+        send_command_i(settings.specular, (color & 0x00FF_FFFF) as i32);
     }
 }
 
@@ -2354,15 +2354,15 @@ pub unsafe extern "C" fn sceGuClear(flags: ClearBuffer) {
     }
 
     let filter: u32 = match DRAW_BUFFER.pixel_size {
-        DisplayPixelFormat::Psm5650 => context.clear_color & 0xffffff,
+        DisplayPixelFormat::Psm5650 => context.clear_color & 0x00FF_FFFF,
         DisplayPixelFormat::Psm5551 => {
-            (context.clear_color & 0xffffff) | (context.clear_stencil << 31)
+            (context.clear_color & 0x00FF_FFFF) | (context.clear_stencil << 31)
         }
         DisplayPixelFormat::Psm4444 => {
-            (context.clear_color & 0xffffff) | (context.clear_stencil << 28)
+            (context.clear_color & 0x00FF_FFFF) | (context.clear_stencil << 28)
         }
         DisplayPixelFormat::Psm8888 => {
-            (context.clear_color & 0xffffff) | (context.clear_stencil << 24)
+            (context.clear_color & 0x00FF_FFFF) | (context.clear_stencil << 24)
         }
     };
 
@@ -2467,7 +2467,7 @@ pub unsafe extern "C" fn sceGuClearStencil(stencil: u32) {
 #[allow(non_snake_case)]
 #[no_mangle]
 pub unsafe extern "C" fn sceGuPixelMask(mask: u32) {
-    send_command_i(GeCommand::MaskRgb, mask as i32 & 0xffffff);
+    send_command_i(GeCommand::MaskRgb, mask as i32 & 0x00FF_FFFF);
     send_command_i(GeCommand::MaskAlpha, (mask >> 24) as i32);
 }
 
@@ -2499,7 +2499,7 @@ pub unsafe extern "C" fn sceGuColor(color: u32) {
 #[no_mangle]
 pub unsafe extern "C" fn sceGuColorFunc(func: ColorFunc, color: u32, mask: u32) {
     send_command_i(GeCommand::ColorTest, func as i32 & 0x03);
-    send_command_i(GeCommand::ColorRef, color as i32 & 0xffffff);
+    send_command_i(GeCommand::ColorRef, color as i32 & 0x00FF_FFFF);
     send_command_i(GeCommand::ColorTestmask, mask as i32);
 }
 
@@ -2531,14 +2531,14 @@ pub unsafe extern "C" fn sceGuAlphaFunc(func: AlphaFunc, value: i32, mask: i32) 
 #[allow(non_snake_case)]
 #[no_mangle]
 pub unsafe extern "C" fn sceGuAmbient(color: u32) {
-    send_command_i(GeCommand::AmbientColor, color as i32 & 0xffffff);
+    send_command_i(GeCommand::AmbientColor, color as i32 & 0x00FF_FFFF);
     send_command_i(GeCommand::AmbientAlpha, (color >> 24) as i32);
 }
 
 #[allow(non_snake_case)]
 #[no_mangle]
 pub unsafe extern "C" fn sceGuAmbientColor(color: u32) {
-    send_command_i(GeCommand::MaterialAmbient, color as i32 & 0xffffff);
+    send_command_i(GeCommand::MaterialAmbient, color as i32 & 0x00FF_FFFF);
     send_command_i(GeCommand::MaterialAlpha, (color >> 24) as i32);
 }
 
@@ -2566,8 +2566,8 @@ pub unsafe extern "C" fn sceGuBlendFunc(
         GeCommand::BlendMode,
         src as i32 | ((dest as i32) << 4) | ((op as i32) << 8),
     );
-    send_command_i(GeCommand::BlendFixedA, src_fix as i32 & 0xffffff);
-    send_command_i(GeCommand::BlendFixedB, dest_fix as i32 & 0xffffff);
+    send_command_i(GeCommand::BlendFixedA, src_fix as i32 & 0x00FF_FFFF);
+    send_command_i(GeCommand::BlendFixedB, dest_fix as i32 & 0x00FF_FFFF);
 }
 
 /// Set current primitive color, for specific light components.
@@ -2580,16 +2580,16 @@ pub unsafe extern "C" fn sceGuBlendFunc(
 #[no_mangle]
 pub unsafe extern "C" fn sceGuMaterial(components: LightComponent, color: u32) {
     if components.intersects(LightComponent::AMBIENT) {
-        send_command_i(GeCommand::MaterialAmbient, color as i32 & 0xffffff);
+        send_command_i(GeCommand::MaterialAmbient, color as i32 & 0x00FF_FFFF);
         send_command_i(GeCommand::MaterialAlpha, (color >> 24) as i32);
     }
 
     if components.intersects(LightComponent::DIFFUSE) {
-        send_command_i(GeCommand::MaterialDiffuse, color as i32 & 0xffffff);
+        send_command_i(GeCommand::MaterialDiffuse, color as i32 & 0x00FF_FFFF);
     }
 
     if components.intersects(LightComponent::SPECULAR) {
-        send_command_i(GeCommand::MaterialSpecular, color as i32 & 0xffffff);
+        send_command_i(GeCommand::MaterialSpecular, color as i32 & 0x00FF_FFFF);
     }
 }
 
@@ -2597,10 +2597,10 @@ pub unsafe extern "C" fn sceGuMaterial(components: LightComponent, color: u32) {
 #[allow(non_snake_case)]
 #[no_mangle]
 pub unsafe extern "C" fn sceGuModelColor(emissive: u32, ambient: u32, diffuse: u32, specular: u32) {
-    send_command_i(GeCommand::MaterialEmissive, emissive as i32 & 0xffffff);
-    send_command_i(GeCommand::MaterialAmbient, ambient as i32 & 0xffffff);
-    send_command_i(GeCommand::MaterialDiffuse, diffuse as i32 & 0xffffff);
-    send_command_i(GeCommand::MaterialSpecular, specular as i32 & 0xffffff);
+    send_command_i(GeCommand::MaterialEmissive, emissive as i32 & 0x00FF_FFFF);
+    send_command_i(GeCommand::MaterialAmbient, ambient as i32 & 0x00FF_FFFF);
+    send_command_i(GeCommand::MaterialDiffuse, diffuse as i32 & 0x00FF_FFFF);
+    send_command_i(GeCommand::MaterialSpecular, specular as i32 & 0x00FF_FFFF);
 }
 
 /// Set stencil function and reference value for stencil testing
@@ -2778,16 +2778,16 @@ pub unsafe extern "C" fn sceGuCopyImage(
     destw: i32,
     dest: *mut c_void,
 ) {
-    send_command_i(GeCommand::TransferSrc, (src as i32) & 0xffffff);
+    send_command_i(GeCommand::TransferSrc, (src as i32) & 0x00FF_FFFF);
     send_command_i(
         GeCommand::TransferSrcW,
-        (((src as u32) & 0xff000000) >> 8) as i32 | srcw,
+        (((src as u32) & 0xFF00_0000) >> 8) as i32 | srcw,
     );
     send_command_i(GeCommand::TransferSrcPos, (sy << 10) | sx);
-    send_command_i(GeCommand::TransferDst, (dest as i32) & 0xffffff);
+    send_command_i(GeCommand::TransferDst, (dest as i32) & 0x00FF_FFFF);
     send_command_i(
         GeCommand::TransferDstW,
-        (((dest as u32) & 0xff000000) >> 8) as i32 | destw,
+        (((dest as u32) & 0xFF00_0000) >> 8) as i32 | destw,
     );
     send_command_i(GeCommand::TransferDstPos, (dy << 10) | dx);
     send_command_i(GeCommand::TransferSize, ((height - 1) << 10) | (width - 1));
@@ -2813,7 +2813,7 @@ pub unsafe extern "C" fn sceGuCopyImage(
 #[allow(non_snake_case)]
 #[no_mangle]
 pub unsafe extern "C" fn sceGuTexEnvColor(color: u32) {
-    send_command_i(GeCommand::TexEnvColor, color as i32 & 0xffffff);
+    send_command_i(GeCommand::TexEnvColor, color as i32 & 0x00FF_FFFF);
 }
 
 /// Set how the texture is filtered
@@ -2939,10 +2939,10 @@ pub unsafe extern "C" fn sceGuTexImage(
         GeCommand::TexSize7,
     ];
 
-    send_command_i(TBP_CMD_TBL[mipmap as usize], (tbp as i32) & 0xffffff);
+    send_command_i(TBP_CMD_TBL[mipmap as usize], (tbp as i32) & 0x00FF_FFFF);
     send_command_i(
         TBW_CMD_TBL[mipmap as usize],
-        ((tbp as u32 >> 8) as i32 & 0x0f0000) | tbw,
+        ((tbp as u32 >> 8) as i32 & 0x000F_0000) | tbw,
     );
     send_command_i(
         TSIZE_CMD_TBL[mipmap as usize],
@@ -3122,7 +3122,7 @@ pub unsafe extern "C" fn sceGuTexWrap(u: GuTexWrapMode, v: GuTexWrapMode) {
 #[allow(non_snake_case)]
 #[no_mangle]
 pub unsafe extern "C" fn sceGuClutLoad(num_blocks: i32, cbp: *const c_void) {
-    send_command_i(GeCommand::ClutAddr, (cbp as i32) & 0xffffff);
+    send_command_i(GeCommand::ClutAddr, (cbp as i32) & 0x00FF_FFFF);
     send_command_i(
         GeCommand::ClutAddrUpper,
         ((cbp as u32) >> 8) as i32 & 0xf0000,
@@ -3265,13 +3265,16 @@ pub unsafe extern "C" fn sceGuDrawBezier(
     }
 
     if !indices.is_null() {
-        send_command_i(GeCommand::Base, ((indices as u32) >> 8) as i32 & 0xf0000);
-        send_command_i(GeCommand::Iaddr, (indices as i32) & 0xffffff);
+        send_command_i(
+            GeCommand::Base,
+            ((indices as u32) >> 8) as i32 & 0x000F_0000,
+        );
+        send_command_i(GeCommand::Iaddr, (indices as i32) & 0x00FF_FFFF);
     }
 
     if !vertices.is_null() {
         send_command_i(GeCommand::Base, ((vertices as u32) >> 8) as i32 & 0xf0000);
-        send_command_i(GeCommand::Vaddr, (vertices as i32) & 0xffffff);
+        send_command_i(GeCommand::Vaddr, (vertices as i32) & 0x00FF_FFFF);
     }
 
     send_command_i(GeCommand::Bezier, (v_count << 8) | u_count);
@@ -3327,12 +3330,12 @@ pub unsafe extern "C" fn sceGuDrawSpline(
 
     if !indices.is_null() {
         send_command_i(GeCommand::Base, ((indices as u32) >> 8) as i32 & 0xf0000);
-        send_command_i(GeCommand::Iaddr, (indices as i32) & 0xffffff);
+        send_command_i(GeCommand::Iaddr, (indices as i32) & 0x00FF_FFFF);
     }
 
     if !vertices.is_null() {
         send_command_i(GeCommand::Base, ((vertices as u32) >> 8) as i32 & 0xf0000);
-        send_command_i(GeCommand::Vaddr, (vertices as i32) & 0xffffff);
+        send_command_i(GeCommand::Vaddr, (vertices as i32) & 0x00FF_FFFF);
     }
 
     send_command_i(
@@ -3472,12 +3475,12 @@ pub unsafe extern "C" fn sceGuDrawArrayN(
 
     if !indices.is_null() {
         send_command_i(GeCommand::Base, ((indices as u32) >> 8) as i32 & 0xf0000);
-        send_command_i(GeCommand::Iaddr, indices as i32 & 0xffffff);
+        send_command_i(GeCommand::Iaddr, indices as i32 & 0x00FF_FFFF);
     }
 
     if !vertices.is_null() {
         send_command_i(GeCommand::Base, ((vertices as u32) >> 8) as i32 & 0xf0000);
-        send_command_i(GeCommand::Vaddr, vertices as i32 & 0xffffff);
+        send_command_i(GeCommand::Vaddr, vertices as i32 & 0x00FF_FFFF);
     }
 
     if a3 > 0 {

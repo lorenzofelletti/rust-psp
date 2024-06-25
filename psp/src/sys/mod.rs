@@ -161,6 +161,7 @@ unsafe impl Sync for SceModuleInfo {}
 
 impl SceModuleInfo {
     #[doc(hidden)]
+    #[must_use]
     pub const fn name(s: &str) -> [u8; 27] {
         let bytes = s.as_bytes();
         let mut result = [0; 27];
@@ -226,24 +227,23 @@ pub enum MsCbEvent {
 /// 1 if memory stick inserted, 0 if not or if < 0 on error
 #[inline(always)]
 #[allow(non_snake_case)]
+#[must_use]
 pub unsafe fn MScmIsMediumInserted() -> i32 {
     let mut status: i32 = 0;
 
     let ret = io::sceIoDevctl(
-        b"mscmhc0:\0" as _,
-        0x02025806,
+        core::ptr::from_ref(b"mscmhc0:\0").cast(),
+        0x0202_5806,
         ptr::null_mut(),
         0,
-        &mut status as *mut _ as _,
+        core::ptr::from_mut(&mut status).cast(),
         mem::size_of::<i32>() as i32,
     );
 
     if ret < 0 {
         ret
-    } else if status != 1 {
-        0
     } else {
-        1
+        i32::from(status == 1)
     }
 }
 
@@ -263,8 +263,8 @@ pub unsafe fn MScmIsMediumInserted() -> i32 {
 pub unsafe fn MScmRegisterMSInsertEjectCallback(mut cbid: SceUid) -> i32 {
     sceIoDevctl(
         b"fatms0:\0" as _,
-        0x02415821,
-        &mut cbid as *mut _ as _,
+        0x0241_5821,
+        core::ptr::from_mut(&mut cbid).cast(),
         mem::size_of::<SceUid>() as i32,
         ptr::null_mut(),
         0,
@@ -285,7 +285,7 @@ pub unsafe fn MScmRegisterMSInsertEjectCallback(mut cbid: SceUid) -> i32 {
 pub unsafe fn MScmUnregisterMSInsertEjectCallback(mut cbid: SceUid) -> i32 {
     sceIoDevctl(
         b"fatms0:\0" as _,
-        0x02415822,
+        0x0241_5822,
         &mut cbid as *mut _ as _,
         mem::size_of::<SceUid>() as i32,
         ptr::null_mut(),

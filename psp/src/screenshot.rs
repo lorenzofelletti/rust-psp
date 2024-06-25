@@ -91,12 +91,12 @@ pub fn screenshot_argb_be() -> alloc::vec::Vec<u32> {
     // http://uofw.github.io/upspd/docs/hardware/PSPTEK.htm#memmap
 
     // If this is a kernel address...
-    if top_addr as u32 & 0x80000000 != 0 {
+    if top_addr as u32 & 0x8000_0000 != 0 {
         // Set the kernel cache-through bit.
-        top_addr = (top_addr as u32 | 0xA0000000) as _;
+        top_addr = (top_addr as u32 | 0xA000_0000) as _;
     } else {
         // Else set the regular cache-through bit.
-        top_addr = (top_addr as u32 | 0x40000000) as _;
+        top_addr = (top_addr as u32 | 0x4000_0000) as _;
     }
 
     for x in 0..SCREEN_WIDTH {
@@ -174,8 +174,8 @@ pub fn screenshot_bmp() -> alloc::vec::Vec<u8> {
 
     unsafe {
         core::ptr::copy_nonoverlapping(
-            &payload[0] as *const _ as _,
-            &mut screenshot_buffer[BmpHeader::BYTES] as *mut u8,
+            (core::ptr::from_ref(&payload[0])).cast(),
+            core::ptr::from_mut::<u8>(&mut screenshot_buffer[BmpHeader::BYTES]),
             NUM_PIXELS * BYTES_PER_PIXEL,
         );
     }

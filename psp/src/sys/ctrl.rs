@@ -9,49 +9,49 @@ bitflags::bitflags! {
     #[derive(Clone, Copy, Debug, Default)]
     pub struct CtrlButtons: u32 {
         /// Select button.
-        const SELECT = 0x000001;
+        const SELECT = 0x0000_0001;
         /// Start button.
-        const START = 0x000008;
+        const START = 0x0000_0008;
         /// Up D-Pad button.
-        const UP = 0x000010;
+        const UP = 0x0000_0010;
         /// Right D-Pad button.
-        const RIGHT = 0x000020;
+        const RIGHT = 0x0000_0020;
         /// Down D-Pad button.
-        const DOWN = 0x000040;
+        const DOWN = 0x0000_0040;
         /// Left D-Pad button.
-        const LEFT = 0x000080;
+        const LEFT = 0x0000_0080;
         /// Left trigger.
-        const LTRIGGER = 0x000100;
+        const LTRIGGER = 0x0000_0100;
         /// Right trigger.
-        const RTRIGGER = 0x000200;
+        const RTRIGGER = 0x0000_0200;
         /// Triangle button.
-        const TRIANGLE = 0x001000;
+        const TRIANGLE = 0x0000_1000;
         /// Circle button.
-        const CIRCLE = 0x002000;
+        const CIRCLE = 0x0000_2000;
         /// Cross button.
-        const CROSS = 0x004000;
+        const CROSS = 0x0000_4000;
         /// Square button.
-        const SQUARE = 0x008000;
+        const SQUARE = 0x0000_8000;
         /// Home button. In user mode this bit is set if the exit dialog is visible.
-        const HOME = 0x010000;
+        const HOME = 0x0100_0000;
         /// Hold button.
-        const HOLD = 0x020000;
+        const HOLD = 0x0200_0000;
         /// Music Note button.
-        const NOTE = 0x800000;
+        const NOTE = 0x8000_0000;
         /// Screen button.
-        const SCREEN = 0x400000;
+        const SCREEN = 0x4000_0000;
         /// Volume up button.
-        const VOL_UP = 0x100000;
+        const VOL_UP = 0x1000_0000;
         /// Volume down button.
-        const VOL_DOWN = 0x200000;
+        const VOL_DOWN = 0x2000_0000;
         /// Wlan switch up.
-        const WLAN_UP = 0x040000;
+        const WLAN_UP = 0x0400_0000;
         /// Remote hold position.
-        const REMOTE = 0x080000;
+        const REMOTE = 0x0800_0000;
         /// Disc present.
-        const DISC = 0x1000000;
+        const DISC = 0x0100_0000;
         /// Memory stick present.
-        const MEM_STICK = 0x2000000;
+        const MEM_STICK = 0x0200_0000;
     }
 }
 

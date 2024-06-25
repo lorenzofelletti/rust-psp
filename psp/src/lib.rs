@@ -21,6 +21,9 @@
 // For the `const_generics` feature.
 #![allow(incomplete_features)]
 #![cfg_attr(not(feature = "std"), no_std)]
+// clippy suppressions
+#![allow(clippy::cast_possible_truncation)]
+#![allow(clippy::similar_names)]
 
 #[macro_use]
 extern crate paste;
@@ -80,7 +83,7 @@ fn panic(_: &core::panic::PanicInfo) -> ! {
 #[no_mangle]
 extern "C" fn __rust_foreign_exception() -> ! {
     loop {
-        core::hint::spin_loop()
+        core::hint::spin_loop();
     }
 }
 
