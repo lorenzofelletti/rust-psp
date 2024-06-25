@@ -27,5 +27,5 @@ fn main() {
     std::fs::copy(libunwind, out_file).unwrap();
 
     println!("cargo:rustc-link-lib=static=unwind");
-    println!("cargo:rustc-link-search=native={}", out_dir);
+    println!("cargo:rustc-link-search=native={out_dir}");
 }
