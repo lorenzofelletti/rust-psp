@@ -16,12 +16,6 @@ use core::{
 };
 
 #[cfg(not(feature = "std"))]
-use core::fmt;
-
-#[cfg(not(feature = "std"))]
-use core::intrinsics;
-
-#[cfg(not(feature = "std"))]
 use alloc::{boxed::Box, string::String};
 
 #[link(name = "unwind", kind = "static")]
