@@ -17,7 +17,7 @@
 // For unwinding support
 #![feature(std_internals, panic_info_message, panic_internals, c_unwind)]
 #![cfg_attr(not(feature = "stub-only"), feature(panic_unwind))]
-#![cfg_attr(feature = "std", feature(psp_std))]
+// #![cfg_attr(feature = "std", feature(psp_std))]
 // For the `const_generics` feature.
 #![allow(incomplete_features)]
 #![cfg_attr(not(feature = "std"), no_std)]
