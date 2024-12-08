@@ -29,6 +29,10 @@ extern crate alloc;
 #[cfg(not(feature = "stub-only"))]
 extern crate panic_unwind;
 
+#[cfg(feature = "std")]
+#[macro_use]
+extern crate std;
+
 #[macro_use]
 #[doc(hidden)]
 #[cfg(not(feature = "stub-only"))]
@@ -301,5 +305,16 @@ pub fn enable_home_button() {
         );
 
         sys::sceKernelStartThread(id, 0, ptr::null_mut());
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let result = 4;
+        assert_eq!(result, 4);
     }
 }

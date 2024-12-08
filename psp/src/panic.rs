@@ -12,7 +12,7 @@ use core::{any::Any, mem::ManuallyDrop};
 use core::{
     any::Any,
     mem::{self, ManuallyDrop},
-    panic::{Location, PanicInfo, PanicMessage, PanicPayload as BoxMeUp},
+    panic::{Location, PanicInfo, PanicPayload as BoxMeUp},
 };
 
 #[cfg(not(feature = "std"))]
